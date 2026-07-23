@@ -25,3 +25,19 @@ This project does not use:
 - Browser-based execution
 
 ## Project Structure
+```structre
+Operating-System-Analyzer/
+│
+├── index.html
+│
+├── README.md
+├── LICENSE
+├── PNPMREAD.md
+│
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-log.yaml
+├── pnpm-debug.yaml
+├── pnpm-test.yml
+└── pnpm-install.yaml
+```
