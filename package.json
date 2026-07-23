@@ -1,6 +1,6 @@
 {
   "name": "operating-system-analyzer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cyber security themed Operating System Analyzer built with pure HTML, CSS, and JavaScript",
   "main": "index.html",
   "scripts": {},
