@@ -1,1 +1,17 @@
-
+{
+  "name": "operating-system-analyzer",
+  "version": "1.0.0",
+  "description": "Cyber security themed Operating System Analyzer built with pure HTML, CSS, and JavaScript",
+  "main": "index.html",
+  "scripts": {},
+  "keywords": [
+    "operating-system",
+    "analyzer",
+    "cyber-security",
+    "html",
+    "javascript", 
+    "css"
+  ],
+  "author": "Fian",
+  "license": "GPL-2.0"
+}
