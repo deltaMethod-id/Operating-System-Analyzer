@@ -1,0 +1,14 @@
+pnpm:
+  name: "Custom PNPM System"
+  version: "1.0.0"
+
+engine:
+  mode: "experimental"
+  status: "active"
+
+project:
+  name: "Operating System Analyzer"
+  type: "static-html"
+
+packages:
+  installed: 0
