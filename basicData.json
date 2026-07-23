@@ -1,0 +1,23 @@
+{
+  "project": {
+    "name": "Operating System Analyzer",
+    "version": "1.0.0",
+    "type": "Static HTML",
+    "license": "GPL-2.0"
+  },
+  "system": {
+    "status": "active",
+    "created": "2026-07-23",
+    "environment": "browser"
+  },
+  "features": [
+    "Operating System Analysis",
+    "Cyber Security UI",
+    "System Information Display"
+  ],
+  "dependencies": {
+    "framework": false,
+    "backend": false,
+    "database": false
+  }
+}
