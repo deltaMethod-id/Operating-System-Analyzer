@@ -32,6 +32,7 @@ Operating-System-Analyzer/
 ├── code.js
 ├── basicData.json
 ├── website.json
+├── os.png
 │
 ├── README.md
 ├── PNPMREAD.md
