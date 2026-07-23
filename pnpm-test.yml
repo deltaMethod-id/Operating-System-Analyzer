@@ -1,0 +1,13 @@
+name: pnpm-test
+
+project:
+  name: Operating System Analyzer
+  type: static-html
+
+test:
+  enabled: true
+  command: pnpm test
+
+result:
+  status: success
+  message: "All tests passed"
