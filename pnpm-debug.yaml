@@ -1,0 +1,11 @@
+debug:
+  enabled: true
+  mode: development
+
+project:
+  name: operating-system-analyzer
+  type: static-html
+
+status:
+  build: none
+  dependencies: 0
