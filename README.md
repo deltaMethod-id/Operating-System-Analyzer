@@ -29,15 +29,27 @@ This project does not use:
 Operating-System-Analyzer/
 │
 ├── index.html
+├── code.js
+├── basicData.json
+├── website.json
 │
 ├── README.md
-├── LICENSE
 ├── PNPMREAD.md
+├── LICENSE
+│
+├── .env
+├── .gitignore
 │
 ├── package.json
+├── package-lock.json
+│
+├── pnpm-core.yaml
+├── pnpm-debug.yaml
+├── pnpm-install.yaml
 ├── pnpm-lock.yaml
 ├── pnpm-log.yaml
-├── pnpm-debug.yaml
 ├── pnpm-test.yml
-└── pnpm-install.yaml
+├── pnpm-workspace.yaml
+│
+└── vercel.json
 ```
