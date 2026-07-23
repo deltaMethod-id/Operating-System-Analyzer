@@ -1,6 +1,6 @@
 # Operating System Analyzer
 
-![Version](https://img.shields.io/badge/version-1.0.0-red)
+![Version](https://img.shields.io/badge/version-1.0.1-red)
 
 ## About
 
