@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operating System Analyzer</title>
+<style>
+:root{--red:#ff0040;--red2:#ff2d55;--glass:rgba(20,0,5,0.45);--border:rgba(255,0,64,0.35);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:radial-gradient(circle at 50% 0%,rgba(255,0,64,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,0,64,0.03) 0px,rgba(255,0,64,0.03) 1px,transparent 1px,transparent 3px),#0a0000;color:#eee;font-family:'Consolas','Courier New',monospace;min-height:100vh;padding:20px;}
+.container{max-width:1000px;margin:0 auto;}
+header{text-align:center;padding:30px 20px;margin-bottom:10px;}
+h1{font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:4px;text-transform:uppercase;color:#fff;text-shadow:0 0 8px var(--red),0 0 20px var(--red),0 0 40px rgba(255,0,64,0.5);}
+.status{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 16px;border:1px solid var(--border);border-radius:20px;background:var(--glass);font-size:0.8rem;letter-spacing:2px;}
+.dot{width:8px;height:8px;border-radius:50%;background:#ff0040;box-shadow:0 0 8px #ff0040;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.panel{background:var(--glass);border:1px solid var(--border);border-radius:14px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:20px;margin-bottom:20px;box-shadow:0 0 25px rgba(255,0,64,0.08),inset 0 0 30px rgba(255,0,64,0.03);}
+.panel h2{font-size:0.9rem;letter-spacing:3px;color:var(--red2);text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.stat{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:all .3s;}
+.stat.scanning{animation:flicker .15s infinite;border-color:var(--red);}
+@keyframes flicker{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.stat .label{font-size:0.65rem;color:#999;letter-spacing:2px;text-transform:uppercase;}
+.stat .value{font-size:1rem;color:#fff;margin-top:6px;word-break:break-word;}
+.stat .value.accent{color:var(--red2);font-weight:bold;}
+.input-row{display:flex;gap:10px;flex-wrap:wrap;}
+input[type=text]{flex:1;min-width:180px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:#fff;font-family:inherit;outline:none;}
+input[type=text]:focus{border-color:var(--red);box-shadow:0 0 10px rgba(255,0,64,0.4);}
+button{background:linear-gradient(135deg,var(--red),#8a0026);border:none;color:#fff;padding:10px 20px;border-radius:8px;font-family:inherit;letter-spacing:2px;text-transform:uppercase;font-size:0.8rem;cursor:pointer;box-shadow:0 0 12px rgba(255,0,64,0.5);transition:transform .15s;}
+button:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(255,0,64,0.8);}
+button:active{transform:translateY(0);}
+.refresh-wrap{text-align:center;margin:10px 0 20px;}
+#refreshBtn{padding:12px 34px;font-size:0.9rem;}
+.terminal{background:#000;border:1px solid var(--border);border-radius:10px;padding:14px;height:160px;overflow-y:auto;font-size:0.8rem;line-height:1.5;}
+.terminal div{color:#ff5c7a;}
+.terminal div span{color:#666;}
+.terminal::-webkit-scrollbar{width:6px;}
+.terminal::-webkit-scrollbar-thumb{background:var(--red);border-radius:3px;}
+footer{text-align:center;font-size:0.7rem;color:#666;letter-spacing:2px;margin-top:20px;}
+@media(max-width:500px){.grid{grid-template-columns:1fr 1fr;}h1{letter-spacing:2px;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Operating System Analyzer</h1>
+    <div class="status"><span class="dot"></span> SYSTEM ONLINE</div>
+  </header>
+
+  <div class="panel">
+    <h2>Detection Result</h2>
+    <div class="grid" id="statsGrid"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Custom OS Check</h2>
+    <div class="input-row">
+      <input type="text" id="customOS" placeholder="Masukkan nama OS... contoh: Kali Linux">
+      <button id="checkBtn">Check</button>
+    </div>
+    <div class="stat" style="margin-top:12px;">
+      <div class="label">Custom Result</div>
+      <div class="value accent" id="customResult">N/A</div>
+    </div>
+  </div>
+
+  <div class="refresh-wrap">
+    <button id="refreshBtn">⟳ Refresh Scan</button>
+  </div>
+
+  <div class="panel">
+    <h2>Terminal Log</h2>
+    <div class="terminal" id="terminal"></div>
+  </div>
+
+  <footer>OS-ANALYZER // v1.0 // LOCAL SCAN ONLY</footer>
+</div>
+
+<script>
+const OS_DB=[
+  {name:'Windows',test:/windows nt/i},
+  {name:'Android',test:/android/i},
+  {name:'iOS',test:/iphone|ipad|ipod/i},
+  {name:'ChromeOS',test:/cros/i},
+  {name:'macOS',test:/mac os x/i},
+  {name:'Ubuntu',test:/ubuntu/i},
+  {name:'Debian',test:/debian/i},
+  {name:'Fedora',test:/fedora/i},
+  {name:'FreeBSD',test:/freebsd/i},
+  {name:'Linux',test:/linux/i}
+];
+
+const CUSTOM_DB=['android','ios','windows','macos','mac os','linux','chromeos','chrome os','ubuntu','debian','fedora','freebsd','kali linux','kali','arch linux','arch','manjaro','centos','red hat','redhat','opensuse','suse','solaris','linux mint','mint','pop!_os','pop os','zorin os','zorin','elementary os','elementary','deepin','windows server','tails','gentoo','slackware'];
+
+function detectOS(ua){for(const os of OS_DB){if(os.test.test(ua))return os.name;}return 'Unknown';}
+
+function detectVersion(ua,osName){
+  try{
+    if(osName==='Windows'){const m=ua.match(/windows nt ([\d.]+)/i);const map={'10.0':'10/11','6.3':'8.1','6.2':'8','6.1':'7'};return m?(map[m[1]]||m[1]):'N/A';}
+    if(osName==='Android'){const m=ua.match(/android ([\d.]+)/i);return m?m[1]:'N/A';}
+    if(osName==='iOS'){const m=ua.match(/os ([\d_]+) like mac/i);return m?m[1].replace(/_/g,'.'):'N/A';}
+    if(osName==='macOS'){const m=ua.match(/mac os x ([\d_]+)/i);return m?m[1].replace(/_/g,'.'):'N/A';}
+    return 'N/A';
+  }catch(e){return 'N/A';}
+}
+
+function detectBrowser(ua){
+  if(/edg\//i.test(ua))return 'Edge';
+  if(/opr\//i.test(ua))return 'Opera';
+  if(/chrome\//i.test(ua)&&!/edg\//i.test(ua))return 'Chrome';
+  if(/firefox\//i.test(ua))return 'Firefox';
+  if(/safari\//i.test(ua)&&!/chrome/i.test(ua))return 'Safari';
+  return 'Unknown';
+}
+
+function log(msg){
+  const t=document.getElementById('terminal');
+  const time=new Date().toLocaleTimeString();
+  const line=document.createElement('div');
+  line.innerHTML='<span>['+time+']</span> '+msg;
+  t.appendChild(line);
+  t.scrollTop=t.scrollHeight;
+  while(t.children.length>30)t.removeChild(t.firstChild);
+}
+
+function buildStat(label,value,accent){
+  return '<div class="stat'+(accent?' scanning':'')+'"><div class="label">'+label+'</div><div class="value'+(accent?' accent':'')+'">'+value+'</div></div>';
+}
+
+function runScan(){
+  const grid=document.getElementById('statsGrid');
+  grid.innerHTML='';
+  log('[SYSTEM] Starting scan...');
+  setTimeout(()=>{
+    log('[SYSTEM] Detecting OS...');
+    const ua=navigator.userAgent;
+    const osName=detectOS(ua);
+    const version=detectVersion(ua,osName);
+    const browser=detectBrowser(ua);
+    const platform=navigator.platform||'N/A';
+    const isMobile=/mobi|android|iphone|ipad/i.test(ua)?'Mobile':'Desktop';
+    const resolution=screen.width+' x '+screen.height;
+    const cores=navigator.hardwareConcurrency||'N/A';
+    const memory=navigator.deviceMemory?navigator.deviceMemory+' GB':'N/A';
+    const time=new Date().toLocaleString();
+
+    grid.innerHTML=
+      buildStat('Detected OS',osName,true)+
+      buildStat('OS Version',version)+
+      buildStat('Browser',browser)+
+      buildStat('Platform',platform)+
+      buildStat('Device Type',isMobile)+
+      buildStat('Screen Resolution',resolution)+
+      buildStat('CPU Cores',cores)+
+      buildStat('Memory',memory)+
+      buildStat('Detection Time',time);
+
+    log('[SYSTEM] Scan complete.');
+    setTimeout(()=>{document.querySelectorAll('.stat.scanning').forEach(el=>el.classList.remove('scanning'));},600);
+  },500);
+}
+
+document.getElementById('refreshBtn').addEventListener('click',runScan);
+
+document.getElementById('checkBtn').addEventListener('click',()=>{
+  const val=document.getElementById('customOS').value.trim().toLowerCase();
+  const resultEl=document.getElementById('customResult');
+  if(!val){resultEl.textContent='N/A';return;}
+  const found=CUSTOM_DB.some(name=>val.includes(name)||name.includes(val));
+  resultEl.textContent=found?val.replace(/\b\w/g,c=>c.toUpperCase()):'Unknown';
+  log('[SYSTEM] Custom check: "'+val+'" -> '+resultEl.textContent);
+});
+
+document.getElementById('customOS').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('checkBtn').click();});
+
+runScan();
+</script>
+</body>
+</html>
